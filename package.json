@@ -1,6 +1,6 @@
 {
   "name": "aflow",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "async flow control for calls with callbacks",
   "license": "Apache-2.0",
   "repository": {
