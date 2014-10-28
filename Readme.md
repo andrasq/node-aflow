@@ -1,4 +1,4 @@
-qflow
+aflow
 =====
 
 simple, quick little serial flow control package
