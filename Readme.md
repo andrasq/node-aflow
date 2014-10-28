@@ -7,6 +7,8 @@ simple, quick little serial flow control package
 
         npm install aflow
 
+or `git clone git://github.com/andrasq/node-aflow`
+
 ## Calls
 
 ### repeatUntil( function, callback )

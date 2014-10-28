@@ -1,11 +1,11 @@
 {
   "name": "aflow",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "async flow control for calls with callbacks",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git://github.com/andrasq/node-qflow"
+    "url": "git://github.com/andrasq/node-aflow"
   },
   "main": "index.js",
   "author": {
