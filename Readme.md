@@ -21,34 +21,34 @@ via callback.
         aflow.repeatUntil(
             function(cb) {
                 count += 1;
-                var stopNow = count >= 10;
+                var stopNow = count >= 10 ? count : false;
                 cb(null, stopNow);
             },
-            function(err) {
-                console.log("count =", count);
+            function(err, stoppingCount) {
+                console.log("stoppingCount =", count);
             }
         )
-        // => count = 10
+        // stoppingCount => 10
 
 ### repeatWhile( loopCondition, function, callback )
 
 keep calling function as long as loopCondition holds.
 
-    var aflow = require('aflow');
-    var count = 0;
-    aflow.repeatWhile(
-        function() {
-            return count < 10;
-        },
-        function(cb) {
-            count += 1;
-            cb();
-        },
-        function(err) {
-            console.log("count =", count);
-        }
-    )
-    // => count = 10
+        var aflow = require('aflow');
+        var count = 0;
+        aflow.repeatWhile(
+            function() {
+                return count < 10;
+            },
+            function(cb) {
+                count += 1;
+                cb();
+            },
+            function(err) {
+                console.log("final count =", count);
+            }
+        )
+        // => final count = 10
 
 ### iterate( functionList, callback )
 
@@ -59,15 +59,19 @@ value from the last function, or the error.
 
         var aflow = require('aflow');
         aflow.iterate([
-            function(cb, last) { console.log("first, last", last); cb(null, 1); },
-            function(cb, last) { console.log("second, last", last); cb(null, 2); },
-            function(cb, last) { console.log("third, last", last); cb(null, 3); }
+            function(cb, prev) {
+                console.log("first; previous", prev); cb(null, 1); },
+            function(cb, prev) {
+                console.log("second; previous", prev); cb(null, 2); },
+            function(cb, prev) {
+                console.log("third; previous", prev); cb(null, 3); }
             ],
             function(err, last) {
-                console.log("done, last", last);
+                console.log("done; last", last);
+                // last => 3
             }
         );
-        // => first, last undefined
-        // => second, last 1
-        // => third, last 2
-        // => done, last 3
+        // => first; previous undefined
+        // => second; previous 1
+        // => third; previous 2
+        // => done; last 3
