@@ -14,7 +14,7 @@ All functions run sequentially and stop immediately on error.
 
 ## Functions
 
-### repeatUntil( repeatedFunction(cb), callback(err, stoppedWithValue) )
+### repeatUntil( repeatedFunc(cb), done(err, stoppedWithValue) )
 
 Keep calling the repeated function until it returns a truthy value, then
 return that value via the callback.  Stops looping on error.  This call is
@@ -36,9 +36,9 @@ will not time out.
             }
         );
 
-### repeatWhile( loopTest, repeatedFunction(cb), callback(err) )
+### repeatWhile( loopTest(item, cb), repeatedFunc(cb), done(err) )
 
-Keep calling repeated function as long as the loopTest() function returns
+Keep calling the repeated function as long as the loopTest() function returns
 truthy.  Stops looping on error.  Any value returned by the repeated function
 is ignored.
 
@@ -58,9 +58,10 @@ is ignored.
             }
         );
 
-### applyVisitor( dataItems, visitorFunction(item, cb), callback(err) )
+### applyVisitor( items, visitorFunc(item, cb), done(err) )
 
-Invoke the visitor function on each data item in turn.  Stops on error.
+Invoke the visitor function on each data item in turn.  Stops on error and
+returns the error object.  Does not return a value.
 
     var aflow = require('aflow');
     var visitedItems = [];
@@ -75,7 +76,7 @@ Invoke the visitor function on each data item in turn.  Stops on error.
         }
     );
 
-### iterate( functionList, callback(err, ret1, ret2) )
+### iterate( functionList, done(err, ret1, ret2) )
 
 Call each function on the list.  The functions are passed three arguments, a
 callback and the first two returned values from the previous function called.
