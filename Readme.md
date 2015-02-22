@@ -36,11 +36,11 @@ will not time out.
             }
         );
 
-### repeatWhile( loopTest(item, cb), repeatedFunc(cb), done(err) )
+### repeatWhile( loopTest(), repeatedFunc(cb), done(err) )
 
 Keep calling the repeated function as long as the loopTest() function returns
-truthy.  Stops looping on error.  Any value returned by the repeated function
-is ignored.
+truthy.  loopTest() does not take arguments or a callback. Stops looping on
+error.  Any value returned by the repeated function is ignored.
 
         var aflow = require('aflow');
         var count = 0;
@@ -86,17 +86,17 @@ will be called with the error and the first two results returned by the call
 that produced the error (if the call returned results).
 
         var aflow = require('aflow');
-        var allArgs = [];
+        var args = [];
         aflow.iterate([
-            function(cb, arg1, arg2) { allArgs.push(arg1); allArgs.push(arg2); cb(null, 1, 11); },
-            function(cb, arg1, arg2) { allArgs.push(arg1); allArgs.push(arg2); cb(null, 2, 22,); },
-            function(cb, arg1, arg2) { allArgs.push(arg1); allArgs.push(arg2); cb(null, 3, 33, 333); },
+            function(cb, arg1, arg2) { args.push(arg1); args.push(arg2); cb(null, 1, 11); },
+            function(cb, arg1, arg2) { args.push(arg1); args.push(arg2); cb(null, 2, 22,); },
+            function(cb, arg1, arg2) { args.push(arg1); args.push(arg2); cb(null, 3, 33, 333); },
             ],
             function(err, arg1, arg2, arg3) {
-                allArgs.push(arg1);
-                allArgs.push(arg2);
-                allArgs.push(arg3);
-                // allArgs = [undefined, undefined, 1, 11, 2, 22, 3, 33, undefined]
+                args.push(arg1);
+                args.push(arg2);
+                args.push(arg3);
+                // args = [undefined, undefined, 1, 11, 2, 22, 3, 33, undefined]
             }
         );
 
