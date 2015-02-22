@@ -101,7 +101,7 @@ that produced the error (if the call returned results).
         );
 
 
-### reduce( dataItems, subtotal, combineFunction(subtotal, item, cb), callback(err, total) )
+### reduce( items, subtotal, combineFunc(subtot, item, cb), done(err, total) )
 
 Combine all data items with the subtotal using the given combine function.
 The result returned from the last combine function becomes the subtotal passed
@@ -121,7 +121,7 @@ an error object, that subtotal will be the final subtotal returned.
             }
         );
 
-### map( dataItems, transformFunction(item, cb), callback(err, transformedItems) )
+### map( items, transformFunc(item, cb), callback(err, transformedItems) )
 
 Apply the transformation to each data item, and return the list of transformed
 items.  The transfor function is provided the item and a callback, and should
@@ -135,12 +135,12 @@ along with a defined result, it will be included in the partial results.
             function double(item, cb) {
                 cb(null, 2 * item);
             },
-            function whenDone(err, items) {
-                // items = [2,4,6,8,10]
+            function whenDone(err, transformedItems) {
+                // transformedItems = [2,4,6,8,10]
             }
         );
 
-### filter( dataItems, selectFunction(item, cb), callback(err, selectedItems) )
+### filter( items, selectFunc(item, cb), callback(err, selectedItems) )
 
 Evaluate each data item with the select function and return the list of items
 that were selected.  The select function is provided the item and a callback,
@@ -156,10 +156,11 @@ results.
                 if (item % 2) cb(null, true);
                 else cb(null, false);
             },
-            function whenDone(err, items) {
-                // items = [1,3,5]
+            function whenDone(err, selectedItems) {
+                // selectedItems = [1,3,5]
             }
         );
+
 
 ## ChangeLog
 
