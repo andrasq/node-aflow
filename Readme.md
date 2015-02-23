@@ -166,9 +166,10 @@ results.
 
 0.9.0
 
-- document all calls
-- better unit test coverage
+- documented all calls
+- improved unit test coverage
 - allow applyVisitor() to iterate any object with a numeric length, eg `arguments` or a `Buffer`
+
 
 ## Todo
 
