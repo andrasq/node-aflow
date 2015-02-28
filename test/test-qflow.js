@@ -60,7 +60,44 @@ module.exports = {
                     t.done();
                 }
             );
-        }
+        },
+
+        'should re-throw subsequent func errors': function(t) {
+            t.expect(2);
+            try {
+                qflow.repeatUntil(
+                    function(cb) {
+                        cb(new Error("first error"));
+                        throw new Error("second error");
+                    },
+                    function(err) {
+                        t.equal(err.message, "first error");
+                    }
+                );
+            }
+            catch (err) {
+                t.equal(err.message, "second error");
+                t.done();
+            }
+        },
+
+        'should re-throw callback errors': function(t) {
+            t.expect(1);
+            try {
+                qflow.repeatUntil(
+                    function(cb) {
+                        cb(null, true);
+                    },
+                    function(err) {
+                        throw new Error("callback error");
+                    }
+                );
+            }
+            catch (err) {
+                t.equal(err.message, "callback error");
+                t.done();
+            }
+        },
     },
 
     'repeatWhile': {
