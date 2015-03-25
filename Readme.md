@@ -164,6 +164,19 @@ results.
 
 ## ChangeLog
 
+0.9.3
+
+- use nextTick if setImmediate is not available (for eg node v0.8)
+
+0.9.2
+
+- speedup by using closure not func args
+
+0.9.1
+
+- make sure to call callback only once
+- rethrow errors that occur in the callback
+
 0.9.0
 
 - documented all calls
