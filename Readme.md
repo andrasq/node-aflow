@@ -164,6 +164,11 @@ results.
 
 ## ChangeLog
 
+0.10.0
+
+- make it a fatal error if callback is called more than once
+- refactor for large speedup
+
 0.9.3
 
 - use nextTick if setImmediate is not available (for eg node v0.8)
