@@ -1,6 +1,6 @@
 'use strict';
 
-var qflow = require('../index');
+var qflow = require('./index');
 
 function uniqid() {
     return Math.floor(Math.random() * 0x1000000).toString(16);
@@ -13,7 +13,7 @@ module.exports = {
     },
 
     'should parse package.json': function(t) {
-        require('../package.json');
+        require('./package.json');
         t.done();
     },
 

@@ -1,1 +1,1 @@
-module.exports = require('./lib/qflow');
+module.exports = require('./aflow');

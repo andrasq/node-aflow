@@ -1,6 +1,6 @@
 'use strict';
 
-var qflow = require('../index');
+var qflow = require('./index');
 
 module.exports = {
     'repeatUntil 500k': function(t) {
