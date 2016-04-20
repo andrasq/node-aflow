@@ -1,6 +1,6 @@
 {
   "name": "aflow",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "description": "async flow control for calls with callbacks",
   "license": "Apache-2.0",
   "repository": {
@@ -16,7 +16,7 @@
     "node": ">=0.0.0"
   },
   "scripts": {
-    "test": "nodeunit"
+    "test": "qnit"
   },
   "keywords": [
     "Andras",
@@ -37,6 +37,6 @@
   "dependencies": {
   },
   "devDependencies": {
-    "nodeunit": "0.9.0"
+    "qnit": "0.11.0"
   }
 }
