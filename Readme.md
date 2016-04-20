@@ -164,6 +164,11 @@ results.
 
 ## ChangeLog
 
+0.10.1
+
+- global.setImmediate(f) is more reliable as function(){ setImmediate(f) }
+- flatten source tree
+
 0.10.0
 
 - make it a fatal error if callback is called more than once
