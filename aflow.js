@@ -28,30 +28,48 @@ module.exports.select = filter;
 module.exports.series = iterate;
 module.exports.whilst = repeatWhile;
 
+var qflowSetImmediate = global.setImmediate ? function(f) { setImmediate(f) } : process.nextTick
 
 /**
  * Repeatedly call func until it signals stop (returns truthy) or err.
  * Func is passed just a standard callback taking err and ret.
- * Returns via its callback the truthy value from func.
+ * Returns to the callback the error or the truthy value from func.
  */
 function repeatUntil( func, callback ) {
     'use strict';
 
     callback = callback || function() {};
+    var alreadyReturned;
+    var callDepth = 0;
 
-    function _loop( func, callback, callDepth ) {
-        try {
-            func( function(err, stop) {
-                if (err || stop) return callback(err, stop);
-                if (callDepth < 40) _loop(func, callback, callDepth + 1);
-                else setImmediate(function() { _loop(func, callback, 0); });
-            } );
+    function _invokeCallback( err, stop ) {
+        if (err || stop) {
+            if (alreadyReturned) throw new Error("callback already called");
+            alreadyReturned = true;
+            return callback(err, stop);
         }
-        catch (e) { callback(e); }
+        else if (++callDepth < 40) {
+            _loop();
+        }
+        else {
+            callDepth = 0;
+            qflowSetImmediate(_loop);
+        }
     }
-    // note: 2.5x faster if callback is passed in to _loop vs pulled from closure
 
-    _loop(func, callback, 0);
+    function _loop( ) {
+        try {
+            func( _invokeCallback );
+        }
+        catch (err) {
+            // do not inject errors from within the callback back into the callback.
+            // If func returns without yielding, the callback will still be in
+            // our try/catch block.  Re-throw that error like setImmediate would do.
+            // But if func has not returned yet, the error is from func, so return it.
+            if (alreadyReturned) throw err; else _invokeCallback(err);
+        }
+    }
+    _loop();
 }
 
 /**
@@ -60,7 +78,7 @@ function repeatUntil( func, callback ) {
 function repeatWhile( test, func, callback ) {
     repeatUntil(
         function _loop(cb) {
-            if (test()) func(function(err, ret) { cb(err, false); });
+            if (test()) func(function(err) { cb(err, false); });
             else cb(null, true);
         },
         callback
@@ -75,7 +93,7 @@ function repeatWhile( test, func, callback ) {
 function applyVisitor( dataItems, visitorFunction, callback ) {
     'use strict';
 
-    if (!Array.isArray(dataItems)) {
+    if (!dataItems || typeof dataItems.length !== 'number') {
         return callback(new Error("expected a data array, but got " + typeof data));
     }
 
@@ -103,43 +121,50 @@ function applyVisitor( dataItems, visitorFunction, callback ) {
 function iterate( functionList, callback ) {
     'use strict';
 
-    var lastResult;
+    var lastResult, lastResult2;
+    var callReturned;
     applyVisitor(
         functionList,
         function visitor(func, cb) {
             // send this computed result right back to the visitor loop,
             // it will become the next func`s lastResult
+            // forwards the first 2 results to the next function in the chain
+            callReturned = false;
             func(
-                function(err, ret) {
+                function(err, ret, ret2) {
+                    callReturned = true;
                     lastResult = ret;
-                    cb(err, ret);
+                    lastResult2 = ret2;
+                    cb(err, ret, ret2);
                 },
-                lastResult
+                lastResult,
+                lastResult2
             );
         },
         function(err, ret) {
             // return the very last result computed, that applyVisitor returns
-            return callback ? callback(err, lastResult) : null;
+            return callback ? (callReturned ? callback(err, lastResult, lastResult2) : callback(err)) : null;
         }
     );
-    // node v0.11.13 runs this 30% slower than v0.10.25
 }
 
 /**
  * Combine all items in the data array using func.
+ * runningTotal is the initial combined value; a call to combinerFunc is given
+ * the running total and item and the return value is the new runningTotal.
+ * This is an async variant of Array.prototype.reduce().
  */
-// TODO: testme
-function reduce( data, combinerFunc, runningTotal, callback ) {
+function reduce( data, runningTotal, combinerFunc, callback ) {
     'use strict';
 
     applyVisitor(
         data,
         function visitor(item, cb) {
-            combinerFunc(item, function(err, ret) {
+            combinerFunc(runningTotal, item, function(err, ret) {
                 // the running total is the combined results of item and the
                 // previous subtotal, as computed by func().
-                runningTotal = ret;
-                return err ? cb(err) : cb(null, runningTotal);
+                if (!err || ret !== undefined) runningTotal = ret;
+                return cb(err, runningTotal);
             });
         },
         function(err, ret) {
@@ -154,7 +179,6 @@ function reduce( data, combinerFunc, runningTotal, callback ) {
  * In case of error returns the partial results so far;
  * the very last returned result is the one that errored out.
  */
-// TODO: testme
 function map( data, mapperFunc, callback ) {
     // TODO: might also want to map properties of an object, not just arrays
     // Approach: convert object to list, map list, de-convert results.
@@ -164,32 +188,33 @@ function map( data, mapperFunc, callback ) {
         data,
         function visitor(item, cb) {
             mapperFunc(item, function(err, mappedItem) {
-                mappedResults.push(mappedItem);
+                if (!err || mappedItem !== undefined) mappedResults.push(mappedItem);
                 cb(err);
             });
         },
         function(err, ret) {
-            return callback ? callback(err, mappedResults) : null;
+            return callback(err, mappedResults);;
         }
     );
 }
 
 /**
  * Return the list of items that were picked by the filter function.
+ * The filter function should return truthy for values to include,
+ * and falsy for values to omit from the results.
  */
-// TODO: testme
 function filter( data, filterFunc, callback ) {
     var pickedItems = [];
     applyVisitor(
         data,
         function visitor(item, cb) {
-            filterFunc(item, function(err, ret) {
-                if (ret && !err) pickedItems.push(item);
+            filterFunc(item, function(err, yesno) {
+                if (yesno) pickedItems.push(item);
                 cb(err);
             });
         },
         function(err) {
-            return callback ? callback(err, pickedItems) : null;
+            callback(err, pickedItems);
         }
     );
 }

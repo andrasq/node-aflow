@@ -1,6 +1,6 @@
 {
   "name": "aflow",
-  "version": "0.2.3",
+  "version": "0.10.1",
   "description": "async flow control for calls with callbacks",
   "license": "Apache-2.0",
   "repository": {
@@ -16,17 +16,27 @@
     "node": ">=0.0.0"
   },
   "scripts": {
-    "test": "nodeunit"
+    "test": "qnit test-*"
   },
   "keywords": [
     "Andras",
     "quick",
+    "async",
+    "fast",
+    "recursion-safe",
     "flow",
     "control",
-    "async"
+    "repeatUntil",
+    "repeatWhile",
+    "applyVisitor",
+    "iterate",
+    "reduce",
+    "map",
+    "filter"
   ],
   "dependencies": {
   },
   "devDependencies": {
+    "qnit": "0.11.0"
   }
 }
